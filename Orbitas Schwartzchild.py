@@ -92,13 +92,13 @@ for i in range(len(r)):
 # que lleva a la colision:
 w0 = np.array([0, R, 0])
 r0dot = c/5
-theta0dot = .04 # Ha de cumplirse r0dot**2+R**2theta0dot**2<c**2
+theta0dot = 0 # Ha de cumplirse r0dot**2+R**2theta0dot**2<c**2
 if r0dot**2+R**2*theta0dot**2>=c**2:
     print('Error: velocidad absurda.')
 t0dot = np.sqrt((-c**2-1/(1-2*mu/R)*r0dot**2-R**2*theta0dot**2)/(-1+2*mu/R))/c
 w0dot = np.array([t0dot, r0dot, theta0dot])
 a = 0 # Tiempo inicial
-b = 22.5# Tiempo final
+b = 30# Tiempo final
 N = 50000 # Numero de pasos
 ss2, W2, Wdot2 = MyN_python_siempre_contigo.segundo_orden(wddot, a, b, w0, w0dot, N, verbose = 0)
 t2 = W2[:,0]
@@ -109,7 +109,7 @@ y=r2*np.sin(theta2)
 plt.figure()
 plt.plot(x,y)
 plt.plot(2*mu*np.cos(np.linspace(0,2*np.pi)),2*mu*np.sin(np.linspace(0,2*np.pi)))
-indices = np.array([0, 5000, 15000])
+indices = np.array([0, 500, 50000])
 for i in indices:
     plt.plot(x[i],y[i],'o')
     cadena='t='+str(round(t2[i]))
@@ -124,3 +124,24 @@ plt.text(x[i]+.2,y[i]-.6,cadena)
 #ylim([-M,M])
 #plt.axes().set_aspect('equal')
 plt.title('Órbita de colisión')
+
+for i in range(len(r2)):
+    
+    if (r2[i] <= (R+1e-4) and r2[i] >= (R-1e-4)) or r2[i] == R:
+        
+        if i > 5000:
+            
+            r_int = r2[0:i]
+            
+            t_int = t2[0:i]
+            
+            Wdot2_int = Wdot2[0:i, 1]
+            
+            t_prop = integrate.simpson(integrando(r_int, Wdot2_int), t_int)/c
+        
+            print('')
+            
+            print(f'Aproximadamente, habrán pasado {t2[i]:.3f} segundos para el observador externo (Schwarzschild) y {t_prop:.3f} para el objeto.')
+    
+            print('')
+                        
